@@ -88,12 +88,26 @@ footer.note b{color:var(--ink)}
 #tTable td.num,#tTable th.num{text-align:right;font-variant-numeric:tabular-nums}
 #tTable tbody tr:hover{background:var(--surface-2)}
 .tctrl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+@media (max-width:1024px){
+  main{height:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px max(10px,env(safe-area-inset-right,0px)) 12px max(10px,env(safe-area-inset-left,0px))}
+  #map{position:relative;inset:auto;grid-column:1/-1;width:100%;height:62vh;min-height:360px;border-radius:12px;border:1px solid var(--line)}
+  .panel{position:static;width:auto;max-width:none;max-height:none;box-shadow:none;min-width:0}
+  #info,#top,#legend{max-height:none;overflow:visible;width:auto}
+  #info{grid-column:1;grid-row:2 / span 2}
+  #top{grid-column:2;grid-row:2}
+  #legend{grid-column:2;grid-row:3;align-self:start}
+}
 @media (max-width:640px){
-  main{height:auto;display:flex;flex-direction:column}
-  #map{position:relative;inset:auto;width:100%;height:60vh;min-height:340px}
-  .panel{position:static;width:auto;max-width:none;margin:8px 10px 0;box-shadow:none}
-  #info,#top,#legend{width:auto;max-height:none}
-  select{max-width:100%}
+  header.bar{padding:9px 12px}
+  .controls{gap:10px}
+  .controls>.group{flex:1 1 100%}
+  .controls select{max-width:100%;width:100%}
+  .group>div[style]{display:grid!important;grid-template-columns:1fr;gap:6px}
+  main{grid-template-columns:1fr;padding:8px 10px 12px}
+  #map{height:56vh;min-height:320px}
+  #info,#top,#legend{grid-column:1;grid-row:auto}
+  .seg button{padding:6px 8px}
+  .tabbar .tab{padding:8px 11px;font-size:.74rem}
 }
 </style>
 </head>
@@ -186,7 +200,7 @@ footer.note b{color:var(--ink)}
 </div>
 <footer class="note">
   <b>Fuente:</b> OSIPTEL — PUNKU, datasets de indicadores de telecomunicaciones (descarga oct‑2026). <b>Internet fijo distrital:</b> dataset 2.3 «Conexiones de internet fijo por distrito» (trimestral, mar‑2023 a mar‑2026; segmentos residencial y comercial). <b>Departamental:</b> 1.1 Líneas móviles en servicio, 2.1 Conexiones de internet fijo, 3.1 Conexiones de TV de paga, 4.1 Líneas fijas de abonado, 6.1 Líneas de telefonía de uso público y 10.1 Reclamos presentados (desde ene‑2023, Lima incluye Callao). En líneas móviles, las líneas sin código de área de localización («SIN LAC», hasta 2022) suman al total nacional pero no se asignan a ningún departamento. &nbsp;·&nbsp;
-  <b>Indicadores:</b> % fibra óptica = conexiones de fibra / conexiones totales (no depende del filtro de tecnología); IHH = Σ(cuota de cada empresa en %)², de 0 a 10 000; variación interanual respecto del mismo periodo del año anterior; «por 100 habitantes» = valor del periodo / población censada 2025 × 100 (INEI, Censos Nacionales 2025, población censada por distrito; el mismo denominador para todos los periodos). La población de Sangani (Junín) se suma a Pichanaqui y la de Santa Rosa de Loreto a Yavarí, porque la cartografía 2023 y OSIPTEL aún no los registran como distritos. &nbsp;·&nbsp;
+  <b>Indicadores:</b> % fibra óptica = conexiones de fibra / conexiones totales (no depende del filtro de tecnología); IHH = Σ(cuota de cada empresa en %)², de 0 a 10,000; variación interanual respecto del mismo periodo del año anterior; «por 100 habitantes» = valor del periodo / población censada 2025 × 100 (INEI, Censos Nacionales 2025, población censada por distrito; el mismo denominador para todos los periodos). La población de Sangani (Junín) se suma a Pichanaqui y la de Santa Rosa de Loreto a Yavarí, porque la cartografía 2023 y OSIPTEL aún no los registran como distritos. &nbsp;·&nbsp;
   Límites territoriales: RENLIM — SDOT/PCM (vigencia 2023, referenciales); cuatro distritos de creación reciente (Huaya, Huayllo, Laraos, Santa Rosa de Loreto) se asignan al distrito de origen o al homónimo de la cartografía. &nbsp;·&nbsp; Elaboración: Good Guys Insight.
 </footer>
 
@@ -215,7 +229,9 @@ footer.note b{color:var(--ink)}
   function cap(s){return (s||'').toString().toLowerCase().replace(/(^|[\s(\-\/.])([a-záéíóúñü])/g,function(m,a,b){return a+b.toUpperCase();})
       .replace(/\b(De|Del|La|Las|Los|Y|E|En|Sac|S\.a\.c\.|S\.a\.a\.|S\.a\.|E\.i\.r\.l\.|S\.r\.l\.)\b/g,function(w){var l=w.toLowerCase();return /^(de|del|la|las|los|y|e|en)$/.test(l)?l:w.toUpperCase();}).replace(/^./,function(c){return c.toUpperCase();});}
   function capFirst(s){s=cap(s);return s.charAt(0).toUpperCase()+s.slice(1);}
-  function nf(v,d){if(v==null||!isFinite(v))return '—';return v.toLocaleString('es-PE',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+  // formato fijo: miles con coma (,) y decimales con punto (.), independiente del idioma del navegador
+  function nf(v,d){if(v==null||!isFinite(v))return '—';d=d||0;var neg=v<0,x=Math.abs(v).toFixed(d).split('.');
+    x[0]=x[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');var r=x.join('.');return (neg&&+r.replace(/,/g,'')!==0?'-':'')+r;}
   function pct(v,d){return v==null||!isFinite(v)?'—':nf(v,d==null?1:d)+'%';}
   function sgn(v){return v==null||!isFinite(v)?'—':(v>0?'+':'')+nf(v,1)+'%';}
   function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
@@ -569,9 +585,9 @@ footer.note b{color:var(--ink)}
   document.getElementById('tHead').addEventListener('click',function(e){var th=e.target.closest('th');if(!th)return;var i=+th.dataset.i;
     if(tSort.k===i)tSort.asc=!tSort.asc;else{tSort.k=i;tSort.asc=!TCOLS[i][1];}drawTable();});
   document.getElementById('tCsv').addEventListener('click',function(){
-    var esc=function(v){v=v==null?'':String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
-    var lines=[TCOLS.map(function(c){return esc(c[0]);}).join(';')].concat(TROWS.map(function(r){return r.map(function(v){
-      return typeof v==='number'?String(Math.round(v*100)/100).replace('.',','):esc(v);}).join(';');}));
+    var esc=function(v){v=v==null?'':String(v);return /[,"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};
+    var lines=[TCOLS.map(function(c){return esc(c[0]);}).join(',')].concat(TROWS.map(function(r){return r.map(function(v){
+      return typeof v==='number'?String(Math.round(v*100)/100):esc(v);}).join(',');}));
     var blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
     var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='osiptel_'+state.mode+'_'+state.level+'.csv';document.body.appendChild(a);a.click();
     setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);

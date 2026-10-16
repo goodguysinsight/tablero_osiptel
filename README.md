@@ -28,7 +28,9 @@ Tres pestañas:
   - Panel con serie mensual del departamento y Top 10 de empresas.
 - **Tabla de datos:** todas las zonas con los filtros vigentes del mapa, ordenable por columna y descargable en CSV.
 
-**Clic en una zona** la fija en el panel y en el ranking; el botón **«Ver todo»** regresa a la vista nacional. Diseño **responsive** para escritorio y celular, con modo claro y oscuro.
+**Clic en una zona** la fija en el panel y en el ranking; el botón **«Ver todo»** regresa a la vista nacional. Diseño **responsive**: en escritorio (más de 1,024 px) los paneles flotan sobre el mapa; en tablet pasan a dos columnas bajo el mapa y en celular a una sola columna, con filtros a ancho completo. Incluye modo claro y oscuro.
+
+**Formato numérico:** miles con coma (,) y decimales con punto (.) en todo el tablero y en el CSV exportado (p. ej., 4,135,995 conexiones; 12.6 por cada 100 habitantes), independiente del idioma del navegador.
 
 ## Fuente de datos
 
@@ -46,19 +48,19 @@ Tres pestañas:
 | Hoja | Contenido |
 |---|---|
 | `Leeme` | Descripción de hojas, fuentes y notas metodológicas |
-| `IF_distrital_resumen` | Una fila por distrito (1 891): ubigeo, población 2025, conexiones mar‑2026 y mar‑2025, conexiones de fibra, N° de empresas, IHH, empresa líder y cuota; variación interanual, conexiones por 100 hab. y % fibra como **fórmulas**; fila de total nacional |
-| `IF_distrital_detalle` | Conexiones de internet fijo por trimestre, ubigeo, empresa, tecnología y segmento (~172 mil filas) |
-| `Departamental` | Series por servicio, mes, departamento, empresa y categoría (~144 mil filas) |
+| `IF_distrital_resumen` | Una fila por distrito (1,891): ubigeo, población 2025, conexiones mar‑2026 y mar‑2025, conexiones de fibra, N° de empresas, IHH, empresa líder y cuota; variación interanual, conexiones por 100 hab. y % fibra como **fórmulas**; fila de total nacional |
+| `IF_distrital_detalle` | Conexiones de internet fijo por trimestre, ubigeo, empresa, tecnología y segmento (~172,000 filas) |
+| `Departamental` | Series por servicio, mes, departamento, empresa y categoría (~144,000 filas) |
 | `Poblacion_2025` | Población censada 2025 por distrito, ajustada a la cartografía RENLIM 2023 |
 
 ## Metodología
 
-- **Ubigeo:** el dataset 2.3 no trae ubigeo; se asigna por nombre normalizado (departamento, provincia y distrito, sin tildes ni signos) contra la cartografía RENLIM. Coinciden 1 885 de 1 889 combinaciones; las 4 restantes, distritos de creación reciente, se asignan manualmente: Huaya → Hualla (051010), Huayllo → Ihuayllo (030407), Laraos → San Pedro de Laraos (150712) y Santa Rosa de Loreto → Yavarí (160403). Representan menos del 0,001 % de las conexiones.
+- **Ubigeo:** el dataset 2.3 no trae ubigeo; se asigna por nombre normalizado (departamento, provincia y distrito, sin tildes ni signos) contra la cartografía RENLIM. Coinciden 1,885 de 1,889 combinaciones; las 4 restantes, distritos de creación reciente, se asignan manualmente: Huaya → Hualla (051010), Huayllo → Ihuayllo (030407), Laraos → San Pedro de Laraos (150712) y Santa Rosa de Loreto → Yavarí (160403). Representan menos del 0.001 % de las conexiones.
 - **Población:** se usa la del Censo 2025 por ubigeo. La de **Santa Rosa de Loreto** (160405) se suma a Yavarí y la de **Sangani** (120307) a Pichanaqui, porque la cartografía 2023 y OSIPTEL aún no los registran como distritos. La asignación de Sangani a Pichanaqui es una inferencia (la caída de población de Pichanaqui) y está pendiente de verificar con la ley de creación.
 - **Indicadores:**
   - Conexiones (o líneas) por cada 100 habitantes = valor del periodo / población 2025 × 100. Se usa el mismo denominador para todos los periodos.
   - % fibra óptica = conexiones de fibra / conexiones totales. No depende del filtro de tecnología.
-  - **IHH** = Σ (cuota de cada empresa en %)², de 0 a 10 000. Referencia: menos de 1 500 no concentrado, de 1 500 a 2 500 moderado, más de 2 500 muy concentrado.
+  - **IHH** = Σ (cuota de cada empresa en %)², de 0 a 10,000. Referencia: menos de 1,500 no concentrado, de 1,500 a 2,500 moderado, más de 2,500 muy concentrado.
   - Variación interanual: respecto del mismo trimestre o mes del año anterior.
 - **Escalas de color:** sextiles de la distribución de zonas (tono más oscuro = valor más alto); las variaciones usan una escala divergente con cortes fijos (−20, −5, 0, 5 y 20 %).
 
