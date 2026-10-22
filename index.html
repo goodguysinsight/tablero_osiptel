@@ -14,11 +14,11 @@
 //# sourceMappingURL=leaflet.js.map</script>
 <style>
 :root{--brand:#0b4f8a;--brand-2:#d9622b;--ink:#14212e;--muted:#5a6878;--line:#d9e1ea;
-  --surface:#fff;--surface-2:#eef3f8;--bg:#e8edf3;--mapbg:#dfe6ee;--nodata:#eef2f6;--edge:#9fb0c2;--chip:#e3eef8}
+  --surface:#fff;--surface-2:#eef3f8;--bg:#e8edf3;--mapbg:#dfe6ee;--nodata:#eef2f6;--edge:#9fb0c2;--chip:#e3eef8;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand:#5aa3e6;--brand-2:#f08a52;--ink:#e6edf4;--muted:#9aa9b9;--line:#2c3a48;
-  --surface:#18222d;--surface-2:#202d3a;--bg:#111921;--mapbg:#16202a;--nodata:#26323f;--edge:#3d4e60;--chip:#1f3346}}
+  --surface:#18222d;--surface-2:#202d3a;--bg:#111921;--mapbg:#16202a;--nodata:#26323f;--edge:#3d4e60;--chip:#1f3346;color-scheme:dark}}
 :root[data-theme="dark"]{--brand:#5aa3e6;--brand-2:#f08a52;--ink:#e6edf4;--muted:#9aa9b9;--line:#2c3a48;
-  --surface:#18222d;--surface-2:#202d3a;--bg:#111921;--mapbg:#16202a;--nodata:#26323f;--edge:#3d4e60;--chip:#1f3346}
+  --surface:#18222d;--surface-2:#202d3a;--bg:#111921;--mapbg:#16202a;--nodata:#26323f;--edge:#3d4e60;--chip:#1f3346;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
@@ -31,6 +31,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Ar
 .tabbar .tab{border:1px solid var(--line);border-bottom:none;background:var(--surface-2);color:var(--muted);white-space:nowrap;
   padding:8px 14px;font-size:.78rem;font-weight:700;border-radius:9px 9px 0 0;cursor:pointer}
 .tabbar .tab[aria-pressed=true]{background:var(--surface);color:var(--brand);box-shadow:0 -2px 0 var(--brand) inset}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip,.leaflet-tooltip{background:var(--surface);color:var(--ink)}
+.leaflet-tooltip{border-color:var(--line)}
+.leaflet-tooltip-top:before{border-top-color:var(--surface)}.leaflet-tooltip-bottom:before{border-bottom-color:var(--surface)}
+.leaflet-tooltip-left:before{border-left-color:var(--surface)}.leaflet-tooltip-right:before{border-right-color:var(--surface)}
+.leaflet-bar a,.leaflet-bar a:hover{background:var(--surface);color:var(--ink);border-bottom-color:var(--line)}
+.leaflet-control-attribution{background:var(--surface)!important;color:var(--muted)}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.gg-theme{margin:0 0 6px auto;align-self:center;flex:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:7px;padding:5px 10px;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.gg-theme:hover{border-color:var(--muted)}
+.gg-theme:focus-visible,.tabbar .tab:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (max-width:600px){.tabbar{flex-wrap:wrap;overflow-x:visible}.gg-theme{order:-1;margin:0 0 4px auto}}
 header.bar{padding:9px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
 .titles h1{margin:0;font-size:1.02rem;font-weight:800}
 .titles .sub{font-size:.7rem;color:var(--muted);margin-top:2px;line-height:1.4}
@@ -121,6 +132,7 @@ footer.note b{color:var(--ink)}
   <button class="tab" data-v="if" aria-pressed="true">Internet fijo · mapa distrital</button>
   <button class="tab" data-v="dp" aria-pressed="false">Servicios · mapa departamental</button>
   <button class="tab" data-v="tbl" aria-pressed="false">Tabla de datos</button>
+  <button class="gg-theme" id="ggTheme" type="button" aria-label="Cambiar a modo oscuro">◐ Modo oscuro</button>
 </div>
 <div id="viewMap">
 <header class="bar">
@@ -456,6 +468,8 @@ footer.note b{color:var(--ink)}
   function layerByKey(k){var r=null;curLayer&&curLayer.eachLayer(function(l){if(l.feature&&l.feature.properties.k===k)r=l;});return r;}
   function paintPinned(){if(!state.pinned)return;var l=layerByKey(state.pinned.k);if(l){l.setStyle({weight:2.6,color:tok('--brand-2')});l.bringToFront&&l.bringToFront();}}
   function setLayer(lv){if(curLayer)map.removeLayer(curLayer);if(!layers[lv])layers[lv]=buildLayer(lv);curLayer=layers[lv];curLayer.addTo(map);}
+  // el mapa toma sus colores al dibujarse: al cambiar de tema se repinta
+  document.addEventListener('gg-theme',function(){if(curLayer)refresh();});
   function refresh(){recompute();computeBreaks();curLayer.setStyle(styleFn);paintPinned();legend();showInfo();renderTop();headerText();if(!document.getElementById('viewTable').hidden)renderTable();}
 
   function headerText(){
@@ -604,6 +618,25 @@ footer.note b{color:var(--ink)}
   if(window.ResizeObserver){new ResizeObserver(function(){map.invalidateSize();if(needHome)home();}).observe(document.getElementById('map'));}
   window.addEventListener('load',function(){map.invalidateSize();home();});
   window.addEventListener('resize',function(){map.invalidateSize();});
+})();
+</script>
+<script>
+/* Tema claro / oscuro: respeta el sistema y recuerda la elección del visitante */
+(function () {
+  var root = document.documentElement, btn = document.getElementById('ggTheme');
+  try { var t = localStorage.getItem('gg-theme'); if (t === 'dark' || t === 'light') root.dataset.theme = t; } catch (e) {}
+  var isDark = function () { return root.dataset.theme ? root.dataset.theme === 'dark' : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches); };
+  var label = function () { var d = isDark(); btn.textContent = d ? '◐ Modo claro' : '◐ Modo oscuro'; btn.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); };
+  btn.addEventListener('click', function () {
+    var t = isDark() ? 'light' : 'dark';
+    root.dataset.theme = t;
+    try { localStorage.setItem('gg-theme', t); } catch (e) {}
+    label();
+    document.dispatchEvent(new Event('gg-theme'));
+  });
+  if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', function () { label(); if (!root.dataset.theme) document.dispatchEvent(new Event('gg-theme')); }); }
+  label();
+  if (root.dataset.theme) document.dispatchEvent(new Event('gg-theme'));
 })();
 </script>
 </body>
